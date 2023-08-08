@@ -37,6 +37,8 @@ const ChemicalsRequestModel = db.define('chemicals_request', {
     },
     Request_Status: DataTypes.STRING,
     Request_Comment: DataTypes.STRING,
+    Request_Purpose: DataTypes.STRING,
+    Request_Room: DataTypes.STRING,
 }, {
     freezeTableName: true
 });
