@@ -16,6 +16,8 @@ import StudentRoute from './student/studentRoute/StudentRoute.js'
 
 import ChemicalsRequestRoute from './student/studentRequest/routes/ChemicalsRequestRoute.js';
 
+import LogActivity from './admin/logActivity/routes/LogActivityRoute.js';
+
 const app = express();
 
 app.use(express.json());
@@ -37,6 +39,8 @@ app.use(EquipmentCategoryRoute)
 
 app.use(StudentRoute)
 app.use(ChemicalsRequestRoute)
+
+app.use(LogActivity)
 
 app.listen(3001, () => {
     console.log("Server running on port 3001");
