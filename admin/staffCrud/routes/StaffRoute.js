@@ -28,11 +28,11 @@ app.get("/staff-list", (req, res) => {
 });
 
 const verifyStaff = (req, res, next) => {
-    const token = req.cookies.token;
-    if (!token) {
+    const staffToken = req.cookies.staffToken;
+    if (!staffToken) {
         return res.json({ Error: "Access denied" });
     } else {
-        jwt.verify(token, "jwtSecret", (err, decoded) => {
+        jwt.verify(staffToken, "jwtSecret", (err, decoded) => {
             if (err) {
                 return res.json({ Error: "Access denied" });
             } else {
@@ -65,7 +65,7 @@ app.post("/staff-login", (req, res) => {
         if (err) return res.json({ Error: err });
         if (result.length > 0) {
             if (req.body.Staff_Password === result[0].Staff_Password) {
-                const token = jwt.sign(
+                const staffToken = jwt.sign(
                     {
                         staffId: result[0].Staff_Id,
                         staffFirstName: result[0].Staff_FName,
@@ -77,7 +77,7 @@ app.post("/staff-login", (req, res) => {
                     "jwtSecret",
                     { expiresIn: "1d" }
                 );
-                res.cookie("token", token, { httpOnly: true }).send();
+                res.cookie("staffToken", staffToken, { httpOnly: true }).send();
             } else {
                 res.json({ Error: "Password is incorrect" });
             }
@@ -126,7 +126,7 @@ app.post("/staff-forget-password", (req, res) => {
 });
 
 app.get("/staff-logout", (req, res) => {
-    res.clearCookie("token").send();
+    res.clearCookie("staffToken").send();
 });
 
 app.get('/staff-list', GetStaffs);

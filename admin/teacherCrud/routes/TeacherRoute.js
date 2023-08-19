@@ -28,11 +28,11 @@ app.get("/teacher-list", (req, res) => {
 });
 
 const verifyTeacher = (req, res, next) => {
-    const token = req.cookies.token;
-    if (!token) {
+    const teacherToken = req.cookies.teacherToken;
+    if (!teacherToken) {
         return res.json({ Error: "Access denied" });
     } else {
-        jwt.verify(token, "jwtSecret", (err, decoded) => {
+        jwt.verify(teacherToken, "jwtSecret", (err, decoded) => {
             if (err) {
                 return res.json({ Error: "Access denied" });
             } else {
@@ -65,7 +65,7 @@ app.post("/teacher-login", (req, res) => {
         if (err) return res.json({ Error: err });
         if (result.length > 0) {
             if (req.body.Teacher_Password === result[0].Teacher_Password) {
-                const token = jwt.sign(
+                const teacherToken = jwt.sign(
                     {
                         teacherId: result[0].Teacher_Id,
                         teacherFirstName: result[0].Teacher_FName,
@@ -77,7 +77,7 @@ app.post("/teacher-login", (req, res) => {
                     "jwtSecret",
                     { expiresIn: "1d" }
                 );
-                res.cookie("token", token, { httpOnly: true }).send();
+                res.cookie("teacherToken", teacherToken, { httpOnly: true }).send();
             } else {
                 res.json({ Error: "Password is incorrect" });
             }
@@ -126,7 +126,7 @@ app.post("/teacher-forget-password", (req, res) => {
 });
 
 app.get("/teacher-logout", (req, res) => {
-    res.clearCookie("token").send();
+    res.clearCookie("teacherToken").send();
 });
 
 app.get('/teacher-list', GetTeachers);

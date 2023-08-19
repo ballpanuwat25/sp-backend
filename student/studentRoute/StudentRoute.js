@@ -22,11 +22,11 @@ app.get("/student-list", (req, res) => {
 });
 
 const verifyStudent = (req, res, next) => {
-    const token = req.cookies.token;
-    if (!token) {
+    const studentToken = req.cookies.studentToken;
+    if (!studentToken) {
         return res.json({ Error: "Access denied" });
     } else {
-        jwt.verify(token, "jwtSecret", (err, decoded) => {
+        jwt.verify(studentToken, "jwtSecret", (err, decoded) => {
             if (err) {
                 return res.json({ Error: "Access denied" });
             } else {
@@ -59,7 +59,7 @@ app.post("/student-login", (req, res) => {
         if (err) return res.json({ Error: err });
         if (result.length > 0) {
             if (req.body.Student_Password === result[0].Student_Password) {
-                const token = jwt.sign(
+                const studentToken = jwt.sign(
                     {
                         studentId: result[0].Student_Id,
                         studentFirstName: result[0].Student_FName,
@@ -71,7 +71,7 @@ app.post("/student-login", (req, res) => {
                     "jwtSecret",
                     { expiresIn: "1d" }
                 );
-                res.cookie("token", token, { httpOnly: true }).send();
+                res.cookie("studentToken", studentToken, { httpOnly: true }).send();
             } else {
                 res.json({ Error: "Password is incorrect" });
             }
@@ -120,7 +120,7 @@ app.post("/student-forget-password", (req, res) => {
 });
 
 app.get("/student-logout", (req, res) => {
-    res.clearCookie("token").send();
+    res.clearCookie("studentToken").send();
 });
 
 export default app;

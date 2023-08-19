@@ -24,11 +24,11 @@ app.get("/admin-list", (req, res) => {
 });
 
 const verifyAdmin = (req, res, next) => {
-    const token = req.cookies.token;
-    if (!token) {
+    const adminToken = req.cookies.adminToken;
+    if (!adminToken) {
         return res.json({ Error: "Access denied" });
     } else {
-        jwt.verify(token, "jwtSecret", (err, decoded) => {
+        jwt.verify(adminToken, "jwtSecret", (err, decoded) => {
             if (err) {
                 return res.json({ Error: "Access denied" });
             } else {
@@ -59,7 +59,7 @@ app.post("/admin-login", (req, res) => {
             bcrypt.compare(req.body.Admin_Password, result[0].Admin_Password, (error, response) => {
                 if (error) return res.json({ Error: error });
                 if (response) {
-                    const token = jwt.sign(
+                    const adminToken = jwt.sign(
                         {
                             adminName: result[0].Admin_Name,
                             adminUsername: result[0].Admin_Username,
@@ -69,7 +69,7 @@ app.post("/admin-login", (req, res) => {
                         "jwtSecret",
                         { expiresIn: "1d" }
                     );
-                    res.cookie("token", token, { httpOnly: true }).send();
+                    res.cookie("adminToken", adminToken, { httpOnly: true }).send();
                 } else {
                     res.json({ Error: "Password is incorrect" });
                 }
@@ -127,7 +127,7 @@ app.post("/admin-forget-password", (req, res) => {
 
 
 app.get("/admin-logout", (req, res) => {
-    res.clearCookie("token").send();
+    res.clearCookie("adminToken").send();
 });
 
 export default app;
