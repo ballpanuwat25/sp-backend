@@ -17,7 +17,9 @@ import StudentRoute from './student/studentRoute/StudentRoute.js'
 import ChemicalsRequestRoute from './student/studentChemicalsRequest/routes/ChemicalsRequestRoute.js';
 import EquipmentRequestRoute from './student/studentEquipmentRequest/routes/EquipmentRequestRoute.js';
 
-import LogActivity from './admin/logActivity/routes/LogActivityRoute.js';
+import LogActivityRoute from './admin/logActivity/routes/LogActivityRoute.js';
+
+import BundleRequestRoute from './teacher/routes/BundleRequestRoute.js';
 
 const app = express();
 
@@ -42,7 +44,8 @@ app.use(StudentRoute)
 app.use(ChemicalsRequestRoute)
 app.use(EquipmentRequestRoute)
 
-app.use(LogActivity)
+app.use(LogActivityRoute)
+app.use(BundleRequestRoute)
 
 app.listen(3001, () => {
     console.log("Server running on port 3001");
