@@ -11,7 +11,7 @@ const LogActivityModel = db.define('log_activity', {
         autoIncrement: true
     },
     LogActivity_Name: DataTypes.STRING,
-    Chem_Id: DataTypes.STRING,
+    Chem_Bottle_Id: DataTypes.STRING,
     Equipment_Id: DataTypes.STRING,
     Staff_Id: DataTypes.STRING,
 }, {

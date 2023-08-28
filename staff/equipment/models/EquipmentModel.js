@@ -18,6 +18,7 @@ const EquipmentModel = db.define('equipment', {
     Quantity: DataTypes.INTEGER,
     Location: DataTypes.STRING,
     Price: DataTypes.FLOAT,
+    Fixed_Cost: DataTypes.FLOAT,
 }, {
     freezeTableName: true
 });
