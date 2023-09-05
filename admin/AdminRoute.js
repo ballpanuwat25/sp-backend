@@ -1,7 +1,7 @@
 import express from "express";
 import mysql from "mysql";
 import jwt from "jsonwebtoken";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 
 const salt = 10;
 const app = express();
