@@ -11,10 +11,10 @@ import GetStaffsById from "../controllers/GetStaffsById.js";
 const app = express();
 
 const db = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: '12345678',
-    database: 'special_problem'
+    host: 'us-cdbr-east-06.cleardb.net',
+    user: 'b31dc6ab9dc1a5',
+    password: 'ab7f1437',
+    database: 'heroku_aaa3e2329909778'
 });
 
 app.get("/staff-list", (req, res) => {

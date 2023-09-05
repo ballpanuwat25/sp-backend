@@ -22,6 +22,7 @@ import LogActivityRoute from './admin/logActivity/routes/LogActivityRoute.js';
 import BundleRequestRoute from './teacher/routes/BundleRequestRoute.js';
 
 const app = express();
+const port = process.env.PORT || 3001;
 
 app.use(express.json());
 app.use(cors({
@@ -47,6 +48,6 @@ app.use(EquipmentRequestRoute)
 app.use(LogActivityRoute)
 app.use(BundleRequestRoute)
 
-app.listen(3001, () => {
-    console.log("Server running on port 3001");
+app.listen(port, () => {
+    console.log(`Server is running on port: ${port}`);
 });
