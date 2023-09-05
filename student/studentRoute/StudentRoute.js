@@ -5,10 +5,10 @@ import jwt from "jsonwebtoken";
 const app = express();
 
 const db = mysql.createConnection({
-    host: 'us-cdbr-east-06.cleardb.net',
-    user: 'b31dc6ab9dc1a5',
-    password: 'ab7f1437',
-    database: 'heroku_aaa3e2329909778'
+    host: 'localhost',
+    user: 'root',
+    password: '12345678',
+    database: 'special_problem'
 });
 
 app.get("/student-list", (req, res) => {
