@@ -6,6 +6,7 @@ const db = new Sequelize('specialproject', '472xknavxg70ozh51zee', 'pscale_pw_qn
     dialectOptions: {
         ssl: 'Amazon RDS', 
     },
+    ssl: true,
 });
 
 sequelize
