@@ -11,10 +11,10 @@ import GetStaffsById from "../controllers/GetStaffsById.js";
 const app = express();
 
 const db = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: '12345678',
-    database: 'special_problem'
+    host: 'aws.connect.psdb.cloud',
+    user: '472xknavxg70ozh51zee',
+    password: 'pscale_pw_qn6Wj8TOyfkeMdImKnu7F7mZ6myxx0m5tBzyYq8COpl',
+    database: 'specialproject'
 });
 
 app.get("/staff-list", (req, res) => {
