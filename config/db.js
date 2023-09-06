@@ -1,11 +1,8 @@
 import { Sequelize } from "sequelize";
 
-const db = new Sequelize('specialproject', '472xknavxg70ozh51zee', 'pscale_pw_qn6Wj8TOyfkeMdImKnu7F7mZ6myxx0m5tBzyYq8COpl',{
-    host: 'aws.connect.psdb.cloud',
-    dialect: 'mysql',
-    dialectOptions: {
-        ssl: 'Amazon RDS', // Use 'Amazon RDS' if you're using Amazon RDS
-      },
+const db = new Sequelize('bs9ssq5ixcbio4pdec3s', 'up4j6tz34shhjklb', 'BaQCmWDsJNjzdClEdW0O',{
+    host: 'bs9ssq5ixcbio4pdec3s-mysql.services.clever-cloud.com',
+    dialect: 'mysql'
 });
 
 export default db;

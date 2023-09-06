@@ -11,10 +11,10 @@ import GetTeachersById from "../controllers/GetTeachersById.js";
 const app = express();
 
 const db = mysql.createConnection({
-    host: 'aws.connect.psdb.cloud',
-    user: '472xknavxg70ozh51zee',
-    password: 'pscale_pw_qn6Wj8TOyfkeMdImKnu7F7mZ6myxx0m5tBzyYq8COpl',
-    database: 'specialproject'
+    host: 'bs9ssq5ixcbio4pdec3s-mysql.services.clever-cloud.com',
+    user: 'up4j6tz34shhjklb',
+    password: 'BaQCmWDsJNjzdClEdW0O',
+    database: 'bs9ssq5ixcbio4pdec3s'
 });
 
 app.get("/teacher-list", (req, res) => {
