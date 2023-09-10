@@ -1,34 +1,38 @@
 import express from "express";
-import mysql from "mysql";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
+
+import cors from 'cors';
+import Admin from "./models/AdminModel.js"
 
 const salt = 10;
 const app = express();
 
-const db = mysql.createConnection({
-    host: 'bs9ssq5ixcbio4pdec3s-mysql.services.clever-cloud.com',
-    user: 'up4j6tz34shhjklb',
-    password: 'BaQCmWDsJNjzdClEdW0O',
-    database: 'bs9ssq5ixcbio4pdec3s'
-});
+app.use(
+    cors({
+        origin: 'http://localhost:3000',
+        credentials: true,
+    })
+);
 
-app.get("/admin-list", (req, res) => {
-    db.query("SELECT * FROM admin", (err, result) => {
-        if (err) {
-            console.log(err);
-        } else {
-            res.send(result);
-        }
-    });
+app.get("/admin-list", async (req, res) => {
+    try {
+        const admins = await Admin.findAll();
+        res.status(200).json(admins);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ Error: "Internal server error" });
+    }
 });
 
 const verifyAdmin = (req, res, next) => {
-    const adminToken = req.cookies.adminToken;
-    if (!adminToken) {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1]; // Extract the token from the Authorization header
+
+    if (!token) {
         return res.json({ Error: "Access denied" });
     } else {
-        jwt.verify(adminToken, "jwtSecret", (err, decoded) => {
+        jwt.verify(token, "jwtSecret", (err, decoded) => {
             if (err) {
                 return res.json({ Error: "Access denied" });
             } else {
@@ -51,78 +55,87 @@ app.get("/admin", verifyAdmin, (req, res) => {
     });
 });
 
-app.post("/admin-login", (req, res) => {
-    const sql = "SELECT * FROM admin WHERE Admin_Username = ?";
-    db.query(sql, [req.body.Admin_Username], (err, result) => {
-        if (err) return res.json({ Error: err });
-        if (result.length > 0) {
-            bcrypt.compare(req.body.Admin_Password, result[0].Admin_Password, (error, response) => {
-                if (error) return res.json({ Error: error });
-                if (response) {
-                    const adminToken = jwt.sign(
-                        {
-                            adminName: result[0].Admin_Name,
-                            adminUsername: result[0].Admin_Username,
-                            adminPassword: result[0].Admin_Password,
-                            adminTel: result[0].Admin_Tel,
-                        },
-                        "jwtSecret",
-                        { expiresIn: "1d" }
-                    );
-                    res.cookie("adminToken", adminToken, { httpOnly: true }).send();
-                } else {
-                    res.json({ Error: "Password is incorrect" });
-                }
-            });
-        } else {
-            res.json({ Error: "Username does not exist" });
-        }
-    });
-});
-
-app.post("/admin-register", (req, res) => {
-    const sql = "INSERT INTO admin (Admin_Name, Admin_Username, Admin_Password, Admin_Tel) VALUES (?, ?, ?, ?)";
-    bcrypt.hash(req.body.Admin_Password, salt, (err, hash) => {
-        if (err) return res.json({ Error: err });
-        db.query(sql, [req.body.Admin_Name, req.body.Admin_Username, hash, req.body.Admin_Tel], (error, result) => {
-            if (error) return res.json({ Error: error });
-            res.send(result);
+app.post("/admin-login", async (req, res) => {
+    try {
+        const admin = await Admin.findOne({
+            where: { Admin_Username: req.body.Admin_Username },
         });
-    });
+
+        if (!admin) {
+            return res.status(404).json({ Error: "Username does not exist" });
+        }
+
+        const passwordMatch = await bcrypt.compare(
+            req.body.Admin_Password,
+            admin.Admin_Password
+        );
+
+        if (!passwordMatch) {
+            return res.status(401).json({ Error: "Password is incorrect" });
+        }
+
+        const adminToken = jwt.sign(
+            {
+                adminName: admin.Admin_Name,
+                adminUsername: admin.Admin_Username,
+                adminPassword: admin.Admin_Password,
+                adminTel: admin.Admin_Tel,
+            },
+            "jwtSecret",
+            { expiresIn: "1d" }
+        );
+
+        // Set the cookie without HttpOnly attribute
+        res.cookie("adminToken", adminToken);
+
+        // Send a success response
+        res.json({ Success: "Login successful", token: adminToken });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ Error: "Internal server error" });
+    }
 });
 
-app.post("/admin-forget-password", (req, res) => {
-    const sqlSelect = "SELECT * FROM admin WHERE Admin_Username = ?";
-    const sqlUpdate = "UPDATE admin SET Admin_Password = ? WHERE Admin_Username = ?";
+app.post("/admin-register", async (req, res) => {
+    try {
+        const hashedPassword = await bcrypt.hash(req.body.Admin_Password, salt);
+        await Admin.create({
+            Admin_Name: req.body.Admin_Name,
+            Admin_Username: req.body.Admin_Username,
+            Admin_Password: hashedPassword,
+            Admin_Tel: req.body.Admin_Tel,
+        });
+        res.status(201).send("Admin registered successfully");
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ Error: "Internal server error" });
+    }
+});
 
-    db.query(sqlSelect, [req.body.Admin_Username], (err, result) => {
-        if (err) {
-            return res.json({ Error: err });
+app.post("/admin-forget-password", async (req, res) => {
+    try {
+        const admin = await Admin.findOne({
+            where: { Admin_Username: req.body.Admin_Username },
+        });
+
+        if (!admin) {
+            return res.status(404).json({ Error: "Username does not exist" });
         }
 
-        if (result.length > 0) {
-            const username = result[0].Admin_Username;
-            if (req.body.Admin_Password.length < 8) {
-                return res.json({ Error: "Password must be at least 8 characters" });
-            }
-
-            bcrypt.hash(req.body.Admin_Password, salt, (error, hash) => {
-                if (error) {
-                    return res.json({ Error: error });
-                }
-
-                db.query(sqlUpdate, [hash, username], (error, result) => {
-                    if (error) {
-                        return res.json({ Error: error });
-                    }
-
-                    res.send(result);
-                });
-            });
-        } else {
-            res.json({ Error: "Username does not exist" });
+        if (req.body.Admin_Password.length < 8) {
+            return res
+                .status(400)
+                .json({ Error: "Password must be at least 8 characters" });
         }
-    });
+
+        const hashedPassword = await bcrypt.hash(req.body.Admin_Password, salt);
+        await admin.update({ Admin_Password: hashedPassword });
+        res.send("Password updated successfully");
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ Error: "Internal server error" });
+    }
 });
 
 
