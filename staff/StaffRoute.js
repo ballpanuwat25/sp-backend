@@ -14,7 +14,8 @@ app.use(
 );
 
 const verifyStaff = (req, res, next) => {
-    const staffToken = req.cookies.staffToken;
+    const authHeader = req.headers['authorization'];
+    const staffToken = authHeader && authHeader.split(' ')[1];
     if (!staffToken) {
         return res.json({ Error: "Access denied" });
     } else {
@@ -72,7 +73,9 @@ app.post("/staff-login", async (req, res) => {
             { expiresIn: "1d" }
         );
 
-        res.cookie("staffToken", staffToken, { httpOnly: true }).send();
+        res.cookie("staffToken", staffToken)
+
+        res.json({ Success: "Staff logged in", token: staffToken });
     } catch (err) {
         console.log(err);
         res.status(500).send();
