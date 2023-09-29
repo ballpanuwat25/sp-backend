@@ -6,7 +6,6 @@ const { DataTypes } = Sequelize;
 const LogActivityModel = db.define('log_activity', {
     LogActivity_Id: {
         type: DataTypes.INTEGER,
-        allowNull: false,
         primaryKey: true,
         autoIncrement: true
     },
