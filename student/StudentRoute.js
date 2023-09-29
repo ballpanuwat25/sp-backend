@@ -23,7 +23,8 @@ app.get("/student-list", async (req, res) => {
 });
 
 const verifyStudent = (req, res, next) => {
-    const studentToken = req.cookies.studentToken;
+    const authHeader = req.headers['authorization'];
+    const studentToken = authHeader && authHeader.split(' ')[1]; // Extract the token from the Authorization header
     if (!studentToken) {
         return res.json({ Error: "Access denied" });
     } else {
@@ -77,7 +78,9 @@ app.post("/student-login", async (req, res) => {
             studentTel: student.Student_Tel,
         }, "jwtSecret");
 
-        res.cookie("studentToken", studentToken, { httpOnly: true }).send();
+        res.cookie("studentToken", studentToken);
+
+        res.json({ Success: "Student logged in successfully", token: studentToken });
     }
     catch (err) {
         console.error(err);

@@ -14,7 +14,8 @@ app.use(
 );
 
 const verifyTeacher = (req, res, next) => {
-    const teacherToken = req.cookies.teacherToken;
+    const authHeader = req.headers['authorization'];
+    const teacherToken = authHeader && authHeader.split(' ')[1];
     if (!teacherToken) {
         return res.json({ Error: "Access denied" });
     } else {
@@ -72,7 +73,9 @@ app.post("/teacher-login", async (req, res) => {
             { expiresIn: "1d" }
         );
 
-        res.cookie("teacherToken", teacherToken, { httpOnly: true }).send();
+        res.cookie("teacherToken", teacherToken)
+
+        res.json({ Success: "Teacher logged in", token: teacherToken })
     } catch (err) {
         console.error(err);
         res.status(500).json({ Error: "Internal server error" });
