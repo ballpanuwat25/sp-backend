@@ -1,15 +1,34 @@
 import Staff from "../models/StaffModel.js";
+import { Op } from "sequelize";
 
-const UpdateStaff = async(req, res) => {
+const UpdateStaff = async (req, res) => {
     try {
-        await Staff.update(req.body, {
+        const updatedStaff = req.body;
+        const staffId = req.params.id;
+
+        // Check if the updated username already exists in the database
+        const existingStaff = await Staff.findOne({
             where: {
-                Staff_Id: req.params.id
+                Staff_Username: updatedStaff.Staff_Username,
+                Staff_Id: { [Op.not]: staffId } // Exclude the current staff by ID
             }
         });
-        res.status(200).json({msg: "Staff Updated"});
+
+        if (existingStaff) {
+            // Username already exists, send an error response
+            res.status(400).json({ error: "Username already exists" });
+        } else {
+            // Username is unique, proceed with the update operation
+            await Staff.update(updatedStaff, {
+                where: {
+                    Staff_Id: staffId
+                }
+            });
+            res.status(200).json({ msg: "Staff Updated" });
+        }
     } catch (error) {
         console.log(error.message);
+        res.status(500).json({ error: "Internal Server Error" });
     }
 }
 
