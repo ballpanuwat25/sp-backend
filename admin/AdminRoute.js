@@ -10,7 +10,7 @@ const app = express();
 
 app.use(
     cors({
-        origin: 'https://chemical-reimbursement-system-frontend.vercel.app',
+        origin: 'https://chem-ku-kps.vercel.app',
         credentials: true,
     })
 );

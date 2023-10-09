@@ -29,7 +29,7 @@ const port = process.env.PORT || 3001;
 
 app.use(express.json());
 app.use(cors({
-    origin: ["https://chemical-reimbursement-system-frontend.vercel.app"],
+    origin: ["https://chem-ku-kps.vercel.app"],
     methods: ["GET", "POST", "PATCH", "DELETE"],
     credentials: true
 }));
