@@ -11,6 +11,7 @@ const TeacherModel = db.define('teacher', {
     },
     Teacher_FName: DataTypes.STRING,
     Teacher_LName: DataTypes.STRING,
+    Teacher_Email: DataTypes.STRING,
     Teacher_Username: DataTypes.STRING,
     Teacher_Password: DataTypes.STRING,
     Teacher_Tel: DataTypes.STRING

@@ -62,7 +62,7 @@ app.post("/staff-login", async (req, res) => {
 
         const staffToken = jwt.sign(
             {
-                staffId:staff.Staff_Id,
+                staffId: staff.Staff_Id,
                 staffFirstName: staff.Staff_FName,
                 staffLastName: staff.Staff_LName,
                 staffUsername: staff.Staff_Username,
@@ -108,23 +108,17 @@ app.post("/staff-forget-password", async (req, res) => {
             return res.status(404).json({ Error: "Username does not exist" });
         }
 
-        const staffToken = jwt.sign(
-            {
-                staffId:staff.Staff_Id,
-                staffFirstName: staff.Staff_FName,
-                staffLastName: staff.Staff_LName,
-                staffUsername: staff.Staff_Username,
-                staffPassword: staff.Staff_Password,
-                staffTel: staff.Staff_Tel,
-            },
-            "jwtSecret",
-            { expiresIn: "1d" }
-        );
+        if (req.body.Staff_Password.length < 8) {
+            return res
+                .status(400)
+                .json({ Error: "Password must be at least 8 characters" });
+        }
 
-        res.cookie("staffToken", staffToken, { httpOnly: true }).send();
+        await staff.update({ Staff_Password: req.body.Staff_Password });
+        res.send("Password updated successfully");
     } catch (err) {
-        console.log(err);
-        res.status(500).send();
+        console.error(err);
+        res.status(500).json({ Error: "Internal server error" });
     }
 });
 
