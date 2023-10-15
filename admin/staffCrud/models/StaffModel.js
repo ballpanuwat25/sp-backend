@@ -11,6 +11,7 @@ const StaffModel = db.define('staff', {
     },
     Staff_FName: DataTypes.STRING,
     Staff_LName: DataTypes.STRING,
+    Staff_Email: DataTypes.STRING,
     Staff_Username: DataTypes.STRING,
     Staff_Password: DataTypes.STRING,
     Staff_Tel: DataTypes.STRING

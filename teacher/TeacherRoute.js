@@ -131,7 +131,7 @@ app.post("/teacher-forget-password", async (req, res) => {
             from: 'ballpanuwat25@gmail.com',
             to: teacher.Teacher_Email,
             subject: 'Password Reset Request',
-            text: `To reset your password, click the following link: https://chem-ku-kps.vercel.app/reset-password/${resetToken}`,
+            text: `To reset your password, click the following link: https://chem-ku-kps.vercel.app/teacher-reset-password/${resetToken}`,
         };
 
         // Send the email
