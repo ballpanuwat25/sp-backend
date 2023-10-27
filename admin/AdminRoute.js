@@ -1,11 +1,12 @@
 import express from "express";
 import jwt from "jsonwebtoken";
-import bcrypt from "bcrypt";
 
 import cors from 'cors';
-import Admin from "./models/AdminModel.js"
+import Admin from "./adminCrud/models/AdminModel.js"
 
-const salt = 10;
+import nodemailer from 'nodemailer';
+import { v4 as uuidv4 } from 'uuid';
+
 const app = express();
 
 app.use(
@@ -15,28 +16,20 @@ app.use(
     })
 );
 
-app.get("/admin-list", async (req, res) => {
-    try {
-        const admins = await Admin.findAll();
-        res.status(200).json(admins);
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ Error: "Internal server error" });
-    }
-});
-
 const verifyAdmin = (req, res, next) => {
     const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1]; // Extract the token from the Authorization header
-
-    if (!token) {
+    const adminToken = authHeader && authHeader.split(' ')[1];
+    if (!adminToken) {
         return res.json({ Error: "Access denied" });
     } else {
-        jwt.verify(token, "jwtSecret", (err, decoded) => {
+        jwt.verify(adminToken, "jwtSecret", (err, decoded) => {
             if (err) {
                 return res.json({ Error: "Access denied" });
             } else {
-                req.adminName = decoded.adminName;
+                req.adminId = decoded.adminId;
+                req.adminFirstName = decoded.adminFirstName;
+                req.adminLastName = decoded.adminLastName;
+                req.adminEmail = decoded.adminEmail;
                 req.adminUsername = decoded.adminUsername;
                 req.adminPassword = decoded.adminPassword;
                 req.adminTel = decoded.adminTel;
@@ -48,7 +41,10 @@ const verifyAdmin = (req, res, next) => {
 
 app.get("/admin", verifyAdmin, (req, res) => {
     res.json({
-        adminName: req.adminName,
+        adminId: req.adminId,
+        adminFirstName: req.adminFirstName,
+        adminLastName: req.adminLastName,
+        adminEmail: req.adminEmail,
         adminUsername: req.adminUsername,
         adminPassword: req.adminPassword,
         adminTel: req.adminTel,
@@ -65,18 +61,16 @@ app.post("/admin-login", async (req, res) => {
             return res.status(404).json({ Error: "Username does not exist" });
         }
 
-        const passwordMatch = await bcrypt.compare(
-            req.body.Admin_Password,
-            admin.Admin_Password
-        );
-
-        if (!passwordMatch) {
-            return res.status(401).json({ Error: "Password is incorrect" });
+        if (req.body.Admin_Password !== admin.Admin_Password) {
+            return res.status(401).json({ Error: "Incorrect password" });
         }
 
         const adminToken = jwt.sign(
             {
-                adminName: admin.Admin_Name,
+                adminId: admin.Admin_Id,
+                adminFirstName: admin.Admin_FName,
+                adminLastName: admin.Admin_LName,
+                adminEmail: admin.Admin_Email,
                 adminUsername: admin.Admin_Username,
                 adminPassword: admin.Admin_Password,
                 adminTel: admin.Admin_Tel,
@@ -85,31 +79,12 @@ app.post("/admin-login", async (req, res) => {
             { expiresIn: "1d" }
         );
 
-        // Set the cookie without HttpOnly attribute
-        res.cookie("adminToken", adminToken);
+        res.cookie("adminToken", adminToken)
 
-        // Send a success response
-        res.json({ Success: "Login successful", token: adminToken });
-
+        res.json({ Success: "Admin logged in", token: adminToken });
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ Error: "Internal server error" });
-    }
-});
-
-app.post("/admin-register", async (req, res) => {
-    try {
-        const hashedPassword = await bcrypt.hash(req.body.Admin_Password, salt);
-        await Admin.create({
-            Admin_Name: req.body.Admin_Name,
-            Admin_Username: req.body.Admin_Username,
-            Admin_Password: hashedPassword,
-            Admin_Tel: req.body.Admin_Tel,
-        });
-        res.status(201).send("Admin registered successfully");
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ Error: "Internal server error" });
+        console.log(err);
+        res.status(500).send();
     }
 });
 
@@ -123,21 +98,55 @@ app.post("/admin-forget-password", async (req, res) => {
             return res.status(404).json({ Error: "Username does not exist" });
         }
 
-        if (req.body.Admin_Password.length < 8) {
-            return res
-                .status(400)
-                .json({ Error: "Password must be at least 8 characters" });
-        }
+        const resetToken = uuidv4();
 
-        const hashedPassword = await bcrypt.hash(req.body.Admin_Password, salt);
-        await admin.update({ Admin_Password: hashedPassword });
-        res.send("Password updated successfully");
+        const transporter = nodemailer.createTransport({
+            service: 'Gmail',
+            auth: {
+                user: 'ballpanuwat25@gmail.com',
+                pass: 'qmst ubhq agvs rrnh',
+            },
+        });
+
+        const mailOptions = {
+            from: 'ballpanuwat25@gmail.com',
+            to: admin.Admin_Email,
+            subject: 'Password Reset Request',
+            text: `To reset your password, click the following link: https://chem-ku-kps.vercel.app/admin-reset-password/${resetToken}`,
+        };
+
+        transporter.sendMail(mailOptions, (err, response) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).json({ Error: "Failed to send password reset email" });
+            } else {
+                console.log(`Password reset email sent to: ${admin.Admin_Email}`);
+                res.json({ Success: "Password reset email sent" });
+            }
+        });
+
+        const adminToken = jwt.sign(
+            {
+                adminId: admin.Admin_Id,
+                adminFirstName: admin.Admin_FName,
+                adminLastName: admin.Admin_LName,
+                adminEmail: admin.Admin_Email,
+                adminUsername: admin.Admin_Username,
+                adminPassword: admin.Admin_Password,
+                adminTel: admin.Admin_Tel,
+            },
+            "jwtSecret",
+            { expiresIn: "1d" }
+        );
+
+        res.cookie("adminToken", adminToken)
+
+        res.json({ Success: "Admin logged in", token: adminToken });
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ Error: "Internal server error" });
+        console.log(err);
+        res.status(500).send();
     }
 });
-
 
 app.get("/admin-logout", (req, res) => {
     res.clearCookie("adminToken").send();

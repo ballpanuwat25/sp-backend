@@ -88,23 +88,6 @@ app.post("/teacher-login", async (req, res) => {
     }
 });
 
-app.post("/teacher-register", async (req, res) => {
-    try {
-        await Teacher.create({
-            Teacher_FName: req.body.Teacher_FName,
-            Teacher_LName: req.body.Teacher_LName,
-            Teacher_Email: req.body.Teacher_Email,
-            Teacher_Username: req.body.Teacher_Username,
-            Teacher_Password: req.body.Teacher_Password,
-            Teacher_Tel: req.body.Teacher_Tel,
-        });
-        res.status(201).send("Teacher registered successfully");
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ Error: "Internal server error" });
-    }
-});
-
 app.post("/teacher-forget-password", async (req, res) => {
     try {
         const teacher = await Teacher.findOne({

@@ -3,6 +3,7 @@ import express from 'express';
 import cookieParser from 'cookie-parser';
 
 import AdminRoute from './admin/AdminRoute.js';
+import AdminCrudRoute from './admin/adminCrud/routes/AdminCrudRoute.js';
 import StaffCrudRoute from './admin/staffCrud/routes/StaffCrudRoute.js';
 import TeacherCrudRoute from './admin/teacherCrud/routes/TeacherCrudRoute.js';
 
@@ -35,6 +36,7 @@ app.use(cors({
 }));
 app.use(cookieParser());
 app.use(AdminRoute)
+app.use(AdminCrudRoute)
 app.use(StaffCrudRoute)
 app.use(TeacherCrudRoute)
 

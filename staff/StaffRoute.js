@@ -88,23 +88,6 @@ app.post("/staff-login", async (req, res) => {
     }
 });
 
-app.post("/staff-register", async (req, res) => {
-    try {
-        await Staff.create({
-            Staff_FName: req.body.Staff_FName,
-            Staff_LName: req.body.Staff_LName,
-            Staff_Email: req.body.Staff_Email,
-            Staff_Username: req.body.Staff_Username,
-            Staff_Password: req.body.Staff_Password,
-            Staff_Tel: req.body.Staff_Tel,
-        });
-        res.send("Staff registered");
-    } catch (err) {
-        console.log(err);
-        res.status(500).send();
-    }
-});
-
 app.post("/staff-forget-password", async (req, res) => {
     try {
         const staff = await Staff.findOne({
