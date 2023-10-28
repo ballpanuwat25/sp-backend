@@ -1,7 +1,14 @@
 import express from "express";
 import jwt from "jsonwebtoken";
+import ApproveStudent from "../staff/approveStudent/models/ApproveStudentModel.js";
 import Student from "./models/StudentModel.js";
 import cors from 'cors';
+
+import CreateStudent from "./controllers/CreateStudent.js";
+import DeleteStudent from "./controllers/DeleteStudent.js";
+import UpdateStudent from "./controllers/UpdateStudent.js";
+import GetStudents from "./controllers/GetStudents.js";
+import GetStudentsById from "./controllers/GetStudentsById.js";
 
 const app = express();
 
@@ -11,16 +18,6 @@ app.use(
         credentials: true,
     })
 );
-
-app.get("/student-list", async (req, res) => {
-    try {
-        const students = await Student.findAll();
-        res.status(200).json(students);
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ Error: "Internal server error" });
-    }
-});
 
 const verifyStudent = (req, res, next) => {
     const authHeader = req.headers['authorization'];
@@ -90,7 +87,7 @@ app.post("/student-login", async (req, res) => {
 
 app.post("/student-register", async (req, res) => {
     try {
-        await Student.create({
+        await ApproveStudent.create({
             Student_Id: req.body.Student_Id,
             Student_FName: req.body.Student_FName,
             Student_LName: req.body.Student_LName,
@@ -119,7 +116,7 @@ app.post("/student-forget-password", async (req, res) => {
             return res.status(400).json({ Error: "Password must be at least 8 characters" });
         }
 
-        await Student.update({ Student_Password: req.body.Student_Password });
+        await ApproveStudent.update({ Student_Password: req.body.Student_Password });
         res.json({ Success: "Password changed successfully" });
     } catch (err) {
         console.error(err);
@@ -130,5 +127,11 @@ app.post("/student-forget-password", async (req, res) => {
 app.get("/student-logout", (req, res) => {
     res.clearCookie("studentToken").send();
 });
+
+app.get('/student-list', GetStudents);
+app.get('/student-list/:id', GetStudentsById);
+app.post('/student-list', CreateStudent);
+app.patch('/student-list/:id', UpdateStudent);
+app.delete('/student-list/:id', DeleteStudent);
 
 export default app;

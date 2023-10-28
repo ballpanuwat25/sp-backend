@@ -14,6 +14,7 @@ import EquipmentRoute from './staff/equipment/routes/EquipmentRoute.js';
 import EquipmentCategoryRoute from './staff/equipmentCategory/routes/EquipmentCategoryRoute.js';
 
 import StudentRoute from './student/StudentRoute.js'
+import ApproveStudentRoute from './staff/approveStudent/routes/ApproveStudentRoute.js'
 
 import ChemicalsRequestRoute from './student/studentChemicalsRequest/routes/ChemicalsRequestRoute.js';
 import EquipmentRequestRoute from './student/studentEquipmentRequest/routes/EquipmentRequestRoute.js';
@@ -45,6 +46,8 @@ app.use(ChemicalsDetailRoute)
 
 app.use(EquipmentRoute)
 app.use(EquipmentCategoryRoute)
+
+app.use(ApproveStudentRoute)
 
 app.use(StudentRoute)
 app.use(ChemicalsRequestRoute)
