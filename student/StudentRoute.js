@@ -4,6 +4,10 @@ import ApproveStudent from "../staff/approveStudent/models/ApproveStudentModel.j
 import Student from "./models/StudentModel.js";
 import cors from 'cors';
 
+import axios from "axios";
+
+const LINE_NOTIFY_API_TOKEN2 = "zDRivBRCInkQjXxLKpuTDvsM4ooDJ0B5TQYU9muqUws";
+
 import CreateStudent from "./controllers/CreateStudent.js";
 import DeleteStudent from "./controllers/DeleteStudent.js";
 import UpdateStudent from "./controllers/UpdateStudent.js";
@@ -95,6 +99,21 @@ app.post("/student-register", async (req, res) => {
             Student_Password: req.body.Student_Password,
             Student_Tel: req.body.Student_Tel,
         });
+
+        const { Student_Id } = req.body;
+
+        const message = `นิสิตรหัส ${Student_Id}`;
+
+        const lineNotifyURL = "https://notify-api.line.me/api/notify";
+        const headers = {
+            "Authorization": `Bearer ${LINE_NOTIFY_API_TOKEN2}`,
+            "Content-Type": "application/x-www-form-urlencoded",
+        };
+        const data = new URLSearchParams();
+        data.append("message", message);
+
+        await axios.post(lineNotifyURL, data, { headers });
+
         res.json({ Success: "Student registered successfully" });
     } catch (err) {
         console.error(err);
