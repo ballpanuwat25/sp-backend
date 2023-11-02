@@ -1,10 +1,14 @@
 import express from "express";
 import jwt from "jsonwebtoken";
-import ApproveStudent from "../staff/approveStudent/models/ApproveStudentModel.js";
-import Student from "./models/StudentModel.js";
 import cors from 'cors';
 
 import axios from "axios";
+
+import ApproveStudent from "../staff/approveStudent/models/ApproveStudentModel.js";
+import Student from "./models/StudentModel.js";
+
+import nodemailer from 'nodemailer';
+import { v4 as uuidv4 } from 'uuid';
 
 const LINE_NOTIFY_API_TOKEN2 = "zDRivBRCInkQjXxLKpuTDvsM4ooDJ0B5TQYU9muqUws";
 
@@ -131,12 +135,50 @@ app.post("/student-forget-password", async (req, res) => {
             return res.status(404).json({ Error: "Email does not exist" });
         }
 
-        if (req.body.Student_Password.length < 8) {
-            return res.status(400).json({ Error: "Password must be at least 8 characters" });
-        }
+        const resetToken = uuidv4();
 
-        await ApproveStudent.update({ Student_Password: req.body.Student_Password });
-        res.json({ Success: "Password changed successfully" });
+        const transporter = nodemailer.createTransport({
+            service: "Gmail",
+            auth: {
+                user: 'ballpanuwat25@gmail.com',
+                pass: 'qmst ubhq agvs rrnh',
+            },
+        });
+
+        const mailOptions = {
+            from: 'ballpanuwat25@gmail.com',
+            to: student.Student_Email,
+            subject: 'Password Reset Request',
+            text: `To reset your password, click the following link: https://chem-ku-kps.vercel.app/student-reset-password/${resetToken}`,
+        };
+
+        transporter.sendMail(mailOptions, (err, response) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).json({ Error: "Failed to send password reset email" });
+            } else {
+                console.log(`Password reset email sent to: ${student.Student_Email}`);
+                res.json({ Success: "Password reset email sent" });
+            }
+        });
+
+        const studentToken = jwt.sign(
+            {
+                studentId: student.Student_Id,
+                studentFirstName: student.Student_FName,
+                studentLastName: student.Student_LName,
+                studentEmail: student.Student_Email,
+                studentPassword: student.Student_Password,
+                studentTel: student.Student_Tel,
+            },
+            "jwtSecret",
+            { expiresIn: "1d" }
+        );
+
+        res.cookie("studentToken", studentToken);
+
+        res.json({ Success: "Student logged in", token: studentToken });
+
     } catch (err) {
         console.error(err);
         res.status(500).json({ Error: "Internal server error" });

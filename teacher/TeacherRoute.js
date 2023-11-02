@@ -1,7 +1,7 @@
 import express from "express";
 import jwt from "jsonwebtoken";
-
 import cors from 'cors';
+
 import Teacher from "../admin/teacherCrud/models/TeacherModel.js"
 
 import nodemailer from 'nodemailer';
