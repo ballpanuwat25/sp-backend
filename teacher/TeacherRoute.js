@@ -7,11 +7,14 @@ import Teacher from "../admin/teacherCrud/models/TeacherModel.js"
 import nodemailer from 'nodemailer';
 import { v4 as uuidv4 } from 'uuid';
 
+import dotenv from 'dotenv';
+dotenv.config();
+
 const app = express();
 
 app.use(
     cors({
-        origin: 'https://chem-ku-kps.vercel.app',
+        origin: 'http://localhost:3000',
         credentials: true,
     })
 );
@@ -104,17 +107,17 @@ app.post("/teacher-forget-password", async (req, res) => {
         const transporter = nodemailer.createTransport({
             service: 'Gmail',
             auth: {
-                user: 'ballpanuwat25@gmail.com',
-                pass: 'qmst ubhq agvs rrnh',
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS,
             },
         });
 
         // Define the email message
         const mailOptions = {
-            from: 'ballpanuwat25@gmail.com',
+            from: process.env.EMAIL_USER,
             to: teacher.Teacher_Email,
             subject: 'Password Reset Request',
-            text: `To reset your password, click the following link: https://chem-ku-kps.vercel.app/teacher-reset-password/${resetToken}`,
+            text: `To reset your password, click the following link: http://localhost:3000/teacher-reset-password/${resetToken}`,
         };
 
         // Send the email

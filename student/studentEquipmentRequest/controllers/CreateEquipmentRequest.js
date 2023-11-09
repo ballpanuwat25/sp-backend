@@ -1,7 +1,10 @@
 import EquipmentRequest from "../models/EquipmentRequestModel.js";
 import Equipment from "../../../staff/equipment/models/EquipmentModel.js";
 
-const LINE_NOTIFY_API_TOKEN = "sx3hbxHUdXUnoyRpOONipgkruv46C2tBv7rkzZGkSie";
+import dotenv from 'dotenv';
+dotenv.config();
+
+const LINE_NOTIFY_API_TOKEN = process.env.LINE_TOKEN_REQUEST;
 
 const findEquipmentNameByEquipmentId = async (equipmentId) => {
     try {

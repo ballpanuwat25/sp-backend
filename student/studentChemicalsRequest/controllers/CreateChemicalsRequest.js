@@ -2,7 +2,10 @@ import axios from "axios";
 import ChemicalsRequest from "../models/ChemicalsRequestModel.js";
 import ChemicalsDetail from "../../../staff/chemicalsDetails/models/ChemicalsDetailModel.js";
 
-const LINE_NOTIFY_API_TOKEN = "sx3hbxHUdXUnoyRpOONipgkruv46C2tBv7rkzZGkSie";
+import dotenv from 'dotenv';
+dotenv.config();
+
+const LINE_NOTIFY_API_TOKEN = process.env.LINE_TOKEN_REQUEST;
 
 const findChemNameByChemId = async (chemId) => {
     try {

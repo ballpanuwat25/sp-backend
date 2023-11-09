@@ -10,7 +10,10 @@ import Student from "./models/StudentModel.js";
 import nodemailer from 'nodemailer';
 import { v4 as uuidv4 } from 'uuid';
 
-const LINE_NOTIFY_API_TOKEN2 = "zDRivBRCInkQjXxLKpuTDvsM4ooDJ0B5TQYU9muqUws";
+import dotenv from 'dotenv';
+dotenv.config();
+
+const LINE_NOTIFY_API_TOKEN2 = process.env.LINE_TOKEN_USER;
 
 import CreateStudent from "./controllers/CreateStudent.js";
 import DeleteStudent from "./controllers/DeleteStudent.js";
@@ -22,7 +25,7 @@ const app = express();
 
 app.use(
     cors({
-        origin: 'https://chem-ku-kps.vercel.app',
+        origin: 'http://localhost:3000',
         credentials: true,
     })
 );
@@ -140,16 +143,16 @@ app.post("/student-forget-password", async (req, res) => {
         const transporter = nodemailer.createTransport({
             service: "Gmail",
             auth: {
-                user: 'ballpanuwat25@gmail.com',
-                pass: 'qmst ubhq agvs rrnh',
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS,
             },
         });
 
         const mailOptions = {
-            from: 'ballpanuwat25@gmail.com',
+            from: process.env.EMAIL_USER,
             to: student.Student_Email,
             subject: 'Password Reset Request',
-            text: `To reset your password, click the following link: https://chem-ku-kps.vercel.app/student-reset-password/${resetToken}`,
+            text: `To reset your password, click the following link: http://localhost:3000/student-reset-password/${resetToken}`,
         };
 
         transporter.sendMail(mailOptions, (err, response) => {
