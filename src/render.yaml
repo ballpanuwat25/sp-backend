@@ -1,0 +1,13 @@
+services:
+  - name: express-app
+    env:
+      - key: NODE_ENV
+        value: production
+      - key: DB_HOST
+        value: std.flas.kps.ku.ac.th
+      - key: DB_USER
+        value: 8xYctXvtp@]2i6nE
+      - key: DB_PASSWORD
+        value: 8xYctXvtp@]2i6nE
+      - key: DB_DATABASE
+        value: chem
