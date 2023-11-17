@@ -14,7 +14,7 @@ const app = express();
 
 app.use(
     cors({
-        origin: 'http://localhost:3000',
+        origin: 'http://158.108.194.8:3000',
         credentials: true,
     })
 );
@@ -115,7 +115,7 @@ app.post("/admin-forget-password", async (req, res) => {
             from: process.env.EMAIL_USER,
             to: admin.Admin_Email,
             subject: 'Password Reset Request',
-            text: `To reset your password, click the following link: http://localhost:3000/admin-reset-password/${resetToken}`,
+            text: `To reset your password, click the following link: http://158.108.194.8:3000/admin-reset-password/${resetToken}`,
         };
 
         transporter.sendMail(mailOptions, (err, response) => {
