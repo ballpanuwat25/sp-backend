@@ -29,9 +29,12 @@ import StaffRoute from './src/staff/StaffRoute.js'
 const app = express();
 const port = process.env.PORT || 3001;
 
+import dotenv from 'dotenv';
+dotenv.config();
+
 app.use(express.json());
 app.use(cors({
-    origin: ["http://158.108.194.8:3000"],
+    origin: process.env.ORIGIN,
     methods: ["GET", "POST", "PATCH", "DELETE"],
     credentials: true
 }));

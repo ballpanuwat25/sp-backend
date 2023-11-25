@@ -14,7 +14,7 @@ const app = express();
 
 app.use(
     cors({
-        origin: 'http://158.108.194.8:3000',
+        origin: process.env.ORIGIN,
         credentials: true,
     })
 );
